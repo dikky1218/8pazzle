@@ -32,7 +32,6 @@ public class Main extends Application {
 
         pazzleTableController = loader.getController();
         pazzleTableController.init(solve);
-        solve.setPazzleTableController(pazzleTableController);
 
         scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
@@ -47,6 +46,7 @@ public class Main extends Application {
                     }else{
                         System.out.println("unDiscovered");
                     }
+                    pazzleTableController.updateTiles();
                 }
             }
         });

@@ -31,7 +31,7 @@ public class PazzleTableController {
     }
 
     public void updateTiles(){
-        int[] tiles = solve.getTilesPosition();
+        int[] tiles = solve.getTilesStat();
         String[] str_tiles = new String[tiles.length];
         for(int i=0; i<tiles.length; i++){
             if(tiles[i]==-1){

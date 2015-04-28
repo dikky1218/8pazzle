@@ -1,6 +1,5 @@
 package sample;
 
-import com.sun.jmx.remote.internal.ArrayQueue;
 import javafx.scene.input.KeyCode;
 
 import java.util.*;
@@ -9,60 +8,68 @@ import java.util.*;
  * Created by daiki on 2015/04/27.
  */
 public class Solve {
-    private PazzleTableController pazzleTableController;
 
-    private HashMap<Integer, Coordinate> tilesStat = new HashMap<Integer, Coordinate>();
     int[] answer = {1,2,3,8,-1,4,7,6,5};
 
-    ArrayDeque<HashMap<Integer, Coordinate>> statQueue = new ArrayDeque<HashMap<Integer, Coordinate>>();
+	private int[] tilesStat = new int[9];
+
+    ArrayDeque<int[]> statQueue = new ArrayDeque<int[]>();
 
     Solve(){
-      //  setComplete();
-        tilesStat.clear();
-        tilesStat.put( 5, new Coordinate(0,0));
-        tilesStat.put( 3, new Coordinate(1,0));
-        tilesStat.put( 2, new Coordinate(2,0));
-        tilesStat.put( 6, new Coordinate(0,1));
-        tilesStat.put( 8, new Coordinate(1,1));
-        tilesStat.put( 4, new Coordinate(2,1));
-        tilesStat.put( 7, new Coordinate(0,2));
-        tilesStat.put( -1, new Coordinate(1,2));
-        tilesStat.put( 1, new Coordinate(2,2));
+        setComplete();
+        /*
+		tilesStat[0] = 1;
+		tilesStat[1] = 3;
+		tilesStat[2] = 2;
+		tilesStat[3] = 7;
+		tilesStat[4] = -1;
+		tilesStat[5] = 5;
+		tilesStat[6] = 8;
+		tilesStat[7] = 6;
+		tilesStat[8] = 4;
+		*/
+        System.out.println(isComplete());
+    }
+
+    private void loadToTilesStat(int[] source){
+        copyStat(source, tilesStat);
+    }
+
+    private void copyStat(int[] source, int[] destination){
+        for(int i=0; i<9; i++){
+            destination[i] = source[i];
+        }
     }
 
     public boolean searchStart(){
         boolean isDiscovered = false;
         KeyCode[] directions = {KeyCode.UP,KeyCode.DOWN,KeyCode.RIGHT,KeyCode.LEFT};
-        HashMap<Integer, Coordinate> currentStat = (HashMap<Integer, Coordinate>) tilesStat.clone();
+        int[] currentStat = new int[9];
         List<int[]> searchedStat = new LinkedList<int[]>();
-        int[] tmpStatArray = new int[9];
 
         while(!isDiscovered){
-            tilesStat = (HashMap<Integer, Coordinate>)currentStat.clone();
 
+            copyStat(tilesStat, currentStat);
 
-
-            int[] queueTop = getTilesPosition();
             if(isComplete()){
                 isDiscovered = true;
-                pazzleTableController.updateTiles();
                 continue;
             }
 
             for(KeyCode direction : directions){
-                tilesStat = (HashMap<Integer, Coordinate>)currentStat.clone();
+                loadToTilesStat(currentStat);
                 if(move(direction)) {
-                    if(!searchedStat.contains(tmpStatArray = getTilesPosition())){
-                        searchedStat.add(tmpStatArray);
+                    /*if(!searchedStat.contains(tilesStat)){
+                        searchedStat.add(tilesStat);
                     }else{
                         continue;
                     }
+                    */
                     statQueue.add(tilesStat);
-                    pazzleTableController.updateTiles();
                 }
             }
 
-            if((currentStat = statQueue.poll()) == null){
+            if((tilesStat = statQueue.poll()) == null){
                 isDiscovered = false;
                 break;
             }
@@ -74,17 +81,6 @@ public class Solve {
 
 
 
-    public int[] getTilesPosition(){
-        int[] ret = new int[9];
-
-        for(int i=0; i<9; i++){
-            int x = tilesStat.get(answer[i]).getX();
-            int y = tilesStat.get(answer[i]).getY();
-            ret[x+y*3] = answer[i];
-        }
-
-        return ret;
-    }
 
     public boolean move(KeyCode direction){
         return myIsMovable(direction, true);
@@ -119,72 +115,47 @@ public class Solve {
         }
     }
 
-    private Integer getTileByCoordinate(int x, int y) {
-        for(int i=0; i<9; i++){
-            if(tilesStat.get(answer[i]).equals(x,y)){
-                return answer[i];
-            }
-        }
-        return -3;
+    public int[] getTilesStat(){
+        return tilesStat;
     }
 
-    private void swapTile(int tile){
-        Coordinate tmp = tilesStat.get(tile);
-        tilesStat.remove(tile);
-        tilesStat.put(tile, getVacantTileCoordinate());
-        tilesStat.remove(-1);
-        tilesStat.put(-1, tmp);
+    private int getTileByCoordinate(int x, int y) {
+        return tilesStat[x + y*3];
     }
 
-    private Coordinate getVacantTileCoordinate(){
-        return tilesStat.get(-1);
+    private void swapTile(int tileName){
+        int tilePos = getPosByTileName(tileName);
+        int vacantPos = getPosByTileName(-1);
+        tilesStat[tilePos] = -1;
+        tilesStat[vacantPos] = tileName;
     }
+
     private int getVacantTileX(){
-        return tilesStat.get(-1).getX();
+        return getPosByTileName(-1)%3;
     }
     private int getVacantTileY(){
-        return tilesStat.get(-1).getY();
+        return getPosByTileName(-1)/3;
     }
 
     public void setComplete(){
-        tilesStat.clear();
-        for(int i=0; i<answer.length; i++) {
-            tilesStat.put(answer[i], new Coordinate(i % 3, i / 3));
-        }
+        loadToTilesStat(answer);
     }
 
     public boolean isComplete(){
-        for(int i=0; i<answer.length; i++) {
-            Coordinate pos = tilesStat.get(answer[i]);
-            if(!pos.equals(i % 3, i / 3)){
-                return false;
-            }
+        for(int i=0; i<9; i++) {
+            if(tilesStat[i]!=answer[i])return false;
         }
         return true;
     }
 
-    public void setPazzleTableController(PazzleTableController pazzleTableController) {
-        this.pazzleTableController = pazzleTableController;
+    public int getPosByTileName(int tileName){
+        for(int i=0; i< 9; i++){
+            if(tileName == tilesStat[i])return i;
+        }
+        return -100;
     }
 
 
-    class Coordinate{
-        private int x,y;
-        Coordinate(int x, int y){
-            this.x = x;
-            this.y = y;
-        }
 
-        public int getX(){
-            return x;
-        }
-        public int getY(){
-            return y;
-        }
-
-        public boolean equals(int x, int y) {
-           return (x==this.x) && (y==this.y);
-        }
-    }
 }
 
