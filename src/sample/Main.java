@@ -43,9 +43,14 @@ public class Main extends Application {
                 else if (key == KeyCode.S) {
                     if (solve.searchStart()) {
                         System.out.println("Discovered");
+                        solve.setComplete();
                     }else{
                         System.out.println("unDiscovered");
                     }
+                    pazzleTableController.updateTiles();
+                }
+                else if (key == KeyCode.B) {
+                    solve.scramble(500);
                     pazzleTableController.updateTiles();
                 }
             }

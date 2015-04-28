@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+
 /**
  * Created by daiki on 15/04/28.
  */
@@ -22,12 +25,17 @@ public class Test {
         System.out.println("copy in original method");
         copyArray(a, b);
         displayResult(a, b);
+        System.out.println("a.equals(b) : " + Arrays.equals(a, b));
+
+        System.out.println("class name check test");
+        System.out.println("class name of int[] : " + a.getClass().getTypeName());
     }
     private void copyArray(int[] source, int[] destination){
         //destination = source.clone();
-        for(int i=0; i<9; i++){
+        /*for(int i=0; i<9; i++){
             destination[i] = source[i];
         }
+        */
     }
 
     private void displayResult(int a[], int b[]){
