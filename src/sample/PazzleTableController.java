@@ -1,10 +1,8 @@
 package sample;
 
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 
 
@@ -29,12 +27,17 @@ public class PazzleTableController {
         this.solve = solve;
         updateTiles();
     }
+    void init( Solve solve, int x, int y){
+        init(solve);
+        pazzleTable.setLayoutX(x);
+        pazzleTable.setLayoutY(y);
+    }
 
     public void updateTiles(){
         int[] tiles = solve.getTilesStat();
         String[] str_tiles = new String[tiles.length];
         for(int i=0; i<tiles.length; i++){
-            if(tiles[i]==-1){
+            if(tiles[i]==9){
                 str_tiles[i]="";
             }
             else{
