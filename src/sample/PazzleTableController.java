@@ -2,15 +2,18 @@ package sample;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.BorderPane;
 
 
 /**
  * Created by daiki on 2015/04/27.
  */
 public class PazzleTableController {
-    @FXML GridPane pazzleTable;
+    @FXML BorderPane pazzleTable;
+    @FXML ProgressBar progressBar;
+    @FXML Label infoLabel;
     @FXML Label label00;
     @FXML Label label01;
     @FXML Label label02;
@@ -25,15 +28,12 @@ public class PazzleTableController {
 
     void init( Solve solve){
         this.solve = solve;
-        updateTiles();
-    }
-    void init( Solve solve, int x, int y){
-        init(solve);
-        pazzleTable.setLayoutX(x);
-        pazzleTable.setLayoutY(y);
+        solve.setPazzleTable(this);
+        updatePanel();
     }
 
-    public void updateTiles(){
+
+    public void updatePanel(){
         int[] tiles = solve.getTilesStat();
         String[] str_tiles = new String[tiles.length];
         for(int i=0; i<tiles.length; i++){
@@ -54,11 +54,14 @@ public class PazzleTableController {
         label20.setText(str_tiles[6]);
         label21.setText(str_tiles[7]);
         label22.setText(str_tiles[8]);
+
+        infoLabel.setText(solve.getMessage());
+        progressBar.setProgress(solve.getProgress());
     }
 
     public void moveTile(KeyCode key){
         if(solve.move(key)){
-            updateTiles();
+            updatePanel();
         }
     }
 
