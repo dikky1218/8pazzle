@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.scene.input.KeyCode;
 
 import java.util.*;
@@ -7,28 +9,42 @@ import java.util.*;
 /**
  * Created by daiki on 2015/04/27.
  */
-public class Solve implements Runnable{
+public class Solve extends Task<Integer> {
     private final KeyCode[] directions = {KeyCode.UP,KeyCode.DOWN,KeyCode.RIGHT,KeyCode.LEFT};
+    private PazzleTableController pazzleTable;
+
 
     @Override
-    public void run() {
+    protected Integer call() throws Exception {
         searchStart();
+        return getSearchCount();
     }
 
 
-    static enum Mode  {ALL, HEURISTIC1, HEURISTIC2, HEURISTIC3 };
+    static enum Mode  {ALL, HEURISTIC1, HEURISTIC2, HEURISTIC3 }
     private Mode mode;
+    private String name;
 
     private int[] answer = {1,2,3,8,9,4,7,6,5};
 
 	private int[] tilesStat = new int[9];
     private boolean isDiscovered = false;
-    private int searchCnt;
+    private int searchCnt=0;
 
 
-    Solve(Mode mode){
-        setComplete();
+    public String getName() {
+        return name;
+    }
+
+    Solve(Mode mode, String name){
+        this.name = name;
         this.mode = mode;
+        setComplete();
+    }
+
+
+    public void setPazzleTable(PazzleTableController pazzleTable){
+        this.pazzleTable = pazzleTable;
     }
 
     public void scramble(int cnt){
@@ -37,6 +53,7 @@ public class Solve implements Runnable{
         while(i<cnt){
             if (move(directions[rand.nextInt(4)]))i++;
         }
+        updateProgress();
     }
 
     public int[] getScrambledTileStat(int cnt){
@@ -52,9 +69,7 @@ public class Solve implements Runnable{
     }
 
     private void copyStat(int[] source, int[] destination){
-        for(int i=0; i<9; i++){
-            destination[i] = source[i];
-        }
+        System.arraycopy(source, 0, destination, 0, 9);
     }
 
     public boolean searchStart(){
@@ -68,7 +83,7 @@ public class Solve implements Runnable{
         while(!isDiscovered){
             if(isComplete()){
                 isDiscovered = true;
-                System.out.println("Discovered");
+                System.out.println(name + ": Discovered");
                 continue;
             }
 
@@ -104,23 +119,40 @@ public class Solve implements Runnable{
             if(statQueue.isEmpty()){
                 isDiscovered = false;
                 tilesStat = new int[9];
-                System.out.println("unDiscovered");
+                System.out.println(name + ": unDiscovered");
                 break;
             }
             else{
                 tilesStat = statQueue.get(0).tileStat;
                 statQueue.remove(0);
+                updateProgress();
+                updateScreen();
             }
 
         }
 
         System.out.println("search count : " + searchCnt);
         setComplete();
+        updateProgress();
+        updateScreen();
         return isDiscovered;
     }
 
-    public boolean isDiscovered(){
-        return isDiscovered;
+    private void updateProgress(){
+        String labelStr = String.format("<%s> isDiscovered: %s, search count: %d", name, isDiscovered, searchCnt);
+        updateMessage(labelStr);
+        updateProgress( searchCnt, 362880);
+
+    }
+
+    private void updateScreen(){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                pazzleTable.updatePanel();
+
+            }
+        });
     }
 
     public int getSearchCount(){
@@ -149,7 +181,7 @@ public class Solve implements Runnable{
     public int getHeuristic3(){
         int cst=0;
         int[] backupTileStat = tilesStat.clone();
-        int vacantPos=0;
+        int vacantPos;
 
         while(!isComplete()) {
             if ((vacantPos = getPosByTileName(9)) == 4) {
@@ -248,6 +280,9 @@ public class Solve implements Runnable{
 
     public void setComplete(){
         loadToTilesStat(answer);
+        String labelStr = String.format("<%s> isDiscovered: %s, search count: %d", name, isDiscovered, searchCnt);
+        updateMessage(labelStr);
+        updateProgress(0,1);
     }
 
     public boolean isComplete(){

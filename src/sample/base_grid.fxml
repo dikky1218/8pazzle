@@ -4,7 +4,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane fx:id="baseGrid" gridLinesVisible="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.BaseController">
+<GridPane fx:id="baseGrid" alignment="TOP_CENTER" gridLinesVisible="true" prefHeight="700.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.BaseController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -13,22 +13,4 @@
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
   </rowConstraints>
-    <children>
-        <Pane fx:id="territory0">
-         <children>
-            <Label fx:id="label0" layoutX="14.0" layoutY="369.0" text="Label" />
-         </children></Pane>
-        <Pane fx:id="territory1" GridPane.columnIndex="1">
-         <children>
-            <Label fx:id="label1" layoutX="14.0" layoutY="369.0" text="Label" />
-         </children></Pane>
-        <Pane fx:id="territory2" GridPane.rowIndex="1">
-         <children>
-            <Label fx:id="label2" layoutX="14.0" layoutY="369.0" text="Label" />
-         </children></Pane>
-        <Pane fx:id="territory3" GridPane.columnIndex="1" GridPane.rowIndex="1">
-         <children>
-            <Label fx:id="label3" layoutX="14.0" layoutY="369.0" text="Label" />
-         </children></Pane>
-    </children>
 </GridPane>
