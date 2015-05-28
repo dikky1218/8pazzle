@@ -8,8 +8,10 @@ import java.util.Comparator;
 public class Stat{
     int[] tileStat;
     int heuristic;
+    int cost;
 
-    Stat(int heuristic, int[] tileStat){
+    Stat(int cost, int heuristic, int[] tileStat){
+        this.cost = cost;
         this.tileStat = tileStat;
         this.heuristic = heuristic;
     }

@@ -53,7 +53,7 @@ public class Solve extends Task<Integer> {
         while(i<cnt){
             if (move(directions[rand.nextInt(4)]))i++;
         }
-        updateProgress();
+        updateProgress(0);
     }
 
     public int[] getScrambledTileStat(int cnt){
@@ -77,15 +77,19 @@ public class Solve extends Task<Integer> {
         int[] currentStat = new int[9];
         ArrayList<Integer> searchedHash = new ArrayList<Integer>();
         int hash;
+        int cost = 0;
         searchCnt = 0;
         ArrayList<Stat> statQueue = new ArrayList<Stat>();
+        Comparator<Stat> statComparator = new StatComparator();
 
         while(!isDiscovered){
             if(isComplete()){
                 isDiscovered = true;
                 System.out.println(name + ": Discovered");
-                continue;
+                break;
             }
+
+            cost++;
 
             copyStat(tilesStat, currentStat);
 
@@ -96,19 +100,20 @@ public class Solve extends Task<Integer> {
                         searchedHash.add(hash);
                         switch(mode) {
                             case ALL:
-                                statQueue.add(new Stat(0, tilesStat.clone()));
+                                statQueue.add(new Stat(cost, 0, tilesStat.clone()));
+                                Collections.sort(statQueue, statComparator);
                                 break;
                             case HEURISTIC1:
-                                statQueue.add(new Stat(getHeuristic1(), tilesStat.clone()));
-                                Collections.sort(statQueue, new StatComparator());
+                                statQueue.add(new Stat(cost, getHeuristic1(), tilesStat.clone()));
+                                Collections.sort(statQueue, statComparator);
                                 break;
                             case HEURISTIC2:
-                                statQueue.add(new Stat(getHeuristic2(), tilesStat.clone()));
-                                Collections.sort(statQueue, new StatComparator());
+                                statQueue.add(new Stat(cost, getHeuristic2(), tilesStat.clone()));
+                                Collections.sort(statQueue, statComparator);
                                 break;
                             case HEURISTIC3:
-                                statQueue.add(new Stat(getHeuristic3(), tilesStat.clone()));
-                                Collections.sort(statQueue, new StatComparator());
+                                statQueue.add(new Stat(cost, getHeuristic3(), tilesStat.clone()));
+                                Collections.sort(statQueue, statComparator);
                                 break;
                         }
                         searchCnt++;
@@ -124,22 +129,24 @@ public class Solve extends Task<Integer> {
             }
             else{
                 tilesStat = statQueue.get(0).tileStat;
+                cost = statQueue.get(0).cost;
                 statQueue.remove(0);
-                updateProgress();
+                updateProgress(cost);
                 updateScreen();
             }
 
         }
 
         System.out.println("search count : " + searchCnt);
+        System.out.println("total cost : " + cost);
         setComplete();
-        updateProgress();
+        updateProgress(cost);
         updateScreen();
         return isDiscovered;
     }
 
-    private void updateProgress(){
-        String labelStr = String.format("<%s> isDiscovered: %s, search count: %d", name, isDiscovered, searchCnt);
+    private void updateProgress(int cost){
+        String labelStr = String.format("<%s> search count: %d, total cost: %d", name, searchCnt, cost);
         updateMessage(labelStr);
         updateProgress( searchCnt, 362880);
 
